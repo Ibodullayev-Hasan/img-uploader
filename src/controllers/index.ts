@@ -37,7 +37,7 @@ export class ImgUpload {
 				ContentType: fileType,
 			});
 
-			const MAX_SIZE = 10 * 1024 ** 2; // 5 MB
+			const MAX_SIZE = 10 * 1024 ** 2; // 10 MB
 			if (fileSize > MAX_SIZE) {
 				return res.status(400).json({ error: "File size exceeds the 5MB limit." });
 			}
