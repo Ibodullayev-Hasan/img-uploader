@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ErrorHandler } from "src/errors";
+import { ErrorHandler } from "../errors";
 
 export class ErrorHandlerMiddleware {
     static async errorHandlerMiddleware(err: ErrorHandler, req: Request, res: Response, next: NextFunction) {

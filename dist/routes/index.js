@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const multer_1 = __importDefault(require("multer"));
-const controllers_1 = require("src/controllers"); // ImgUpload va uploadni import qilamiz
+const controllers_1 = require("../controllers"); // ImgUpload va uploadni import qilamiz
 let router = (0, express_1.Router)();
 // Multerni sozlash
 const storage = multer_1.default.memoryStorage();

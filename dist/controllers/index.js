@@ -12,12 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ImgUpload = void 0;
 const client_s3_1 = require("@aws-sdk/client-s3");
 require("dotenv/config");
-// AWS konfiguratsiyasi
 const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION = "ap-southeast-1" } = process.env;
 if (!AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY) {
     throw new Error("AWS_ACCESS_KEY_ID or AWS_SECRET_ACCESS_KEY is missing.");
 }
-// S3 client ni yaratish
 const s3Client = new client_s3_1.S3Client({
     region: AWS_REGION,
     credentials: {
@@ -25,28 +23,35 @@ const s3Client = new client_s3_1.S3Client({
         secretAccessKey: AWS_SECRET_ACCESS_KEY,
     },
 });
-// Fayl yuklash uchun controller
 class ImgUpload {
     static uploadFile(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const fileContent = req.file.buffer; // Multerdan faylni olish
+                const fileContent = req.file.buffer;
                 const fileName = req.file.originalname;
-                const bucketName = process.env.BUCKET_NAME; // .env faylidan bucket nomini olish
-                const region = process.env.AWS_REGION || "ap-southeast-1"; // Regionni environment variabledan olish
+                const bucketName = process.env.BUCKET_NAME;
+                const fileSize = req.file.size;
+                const fileType = req.file.mimetype;
+                const region = process.env.AWS_REGION || "ap-southeast-1";
                 if (!bucketName) {
                     throw new Error('Bucket name is not defined in the environment.');
                 }
-                // Faylni S3 ga yuklash
                 const command = new client_s3_1.PutObjectCommand({
                     Bucket: bucketName,
                     Key: fileName,
                     Body: fileContent,
+                    ContentType: fileType,
                 });
-                const data = yield s3Client.send(command);
-                // Fayl URLni yaratish
+                const MAX_SIZE = 10 * 1024 ** 2; // 10 MB
+                if (fileSize > MAX_SIZE) {
+                    return res.status(400).json({ error: "File size exceeds the 5MB limit." });
+                }
+                const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png"];
+                if (!ALLOWED_TYPES.includes(fileType)) {
+                    return res.status(400).json({ error: "Invalid file type. Only JPEG, JPG, and PNG are allowed." });
+                }
+                yield s3Client.send(command);
                 const fileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
-                // URLni javob sifatida yuborish
                 res.json({ message: "File uploaded successfully", fileUrl: fileUrl });
             }
             catch (error) {

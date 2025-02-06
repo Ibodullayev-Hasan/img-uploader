@@ -1,6 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
-import { ImgUpload } from "src/controllers"; // ImgUpload va uploadni import qilamiz
+import { ImgUpload } from "../controllers"; // ImgUpload va uploadni import qilamiz
 
 let router: Router = Router()
 
